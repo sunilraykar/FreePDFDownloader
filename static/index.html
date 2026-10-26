@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreePDFDownloader</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#131b2e;--panel2:#18233a;--line:#293750;--text:#eef3ff;--muted:#9aa9c4;--accent:#8cb4ff;--green:#83e0b0;--red:#ff9b9b;--amber:#ffd18b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% -20%,#1c3155 0,transparent 45%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1180px;margin:auto;padding:34px 22px 60px}.top{display:flex;align-items:center;gap:14px;margin-bottom:28px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#9fc5ff,#6f88ff);display:grid;place-items:center;color:#10182c;font-size:25px;font-weight:900}.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.15em;font-size:11px;font-weight:800}.top h1{font-size:clamp(25px,4vw,36px);letter-spacing:-.04em;margin:1px 0}.top p{margin:0;color:var(--muted)}
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px}.panel{background:rgba(19,27,46,.94);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 16px 45px #0002}.panel h2{font-size:16px;margin:0 0 17px}.field{margin-bottom:16px}.field label{display:block;font-size:12px;font-weight:700;color:#c4d0e5;margin-bottom:7px}.field input,.field select{width:100%;background:#0c1425;border:1px solid #33435f;border-radius:10px;color:var(--text);padding:12px;font:inherit;outline:none}.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #8cb4ff22}.help{font-size:12px;color:var(--muted);margin-top:6px}.btn{border:0;border-radius:10px;padding:11px 15px;font:700 13px inherit;cursor:pointer;transition:.15s}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--accent);color:#0b1428}.secondary{background:#24324d;color:var(--text);border:1px solid #394b69}.ghost{background:transparent;color:#c7d5ee;border:1px solid #34435d}.btn:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}.full{width:100%}.privacy{font-size:12px;color:var(--muted);margin:15px 0 0}.privacy b{color:var(--green)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.metric{background:#0d1526;border:1px solid #26344c;border-radius:12px;padding:13px}.metric .value{font-size:23px;font-weight:800;letter-spacing:-.04em}.metric .label{font-size:11px;color:var(--muted)}
+.status{display:flex;align-items:center;gap:10px;border:1px solid #2a3a55;background:#0d1526;border-radius:11px;padding:12px 14px;margin-bottom:16px;color:#c5d2e8;font-size:13px}.dot{width:8px;height:8px;border-radius:50%;background:#7b8aa6;flex:none}.dot.active{background:var(--amber);box-shadow:0 0 0 4px #ffd18b18}.dot.ok{background:var(--green)}.dot.error{background:var(--red)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:13px}.toolbar .spacer{flex:1}.count{font-size:12px;color:var(--muted);padding:0 4px}
+.tablewrap{overflow:auto;border:1px solid #293750;border-radius:12px}table{width:100%;border-collapse:collapse;min-width:670px}th{text-align:left;background:#10192b;color:#9eafca;font-size:11px;text-transform:uppercase;letter-spacing:.07em;padding:12px 11px;position:sticky;top:0}td{padding:12px 11px;border-top:1px solid #243149;font-size:12px;vertical-align:top}tr:hover td{background:#18233a}td a{color:#a9c7ff;text-decoration:none;overflow-wrap:anywhere}td a:hover{text-decoration:underline}.filecell{display:flex;gap:9px;align-items:flex-start}.pdficon{background:#442a3b;color:#ffb7c4;border-radius:7px;padding:5px;font-weight:900;font-size:10px}.filename{font-weight:700;font-size:13px;max-width:220px;overflow-wrap:anywhere}.sub{color:var(--muted);font-size:11px;margin-top:3px;max-width:260px;overflow-wrap:anywhere}.pill{display:inline-block;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:800;background:#273650;color:#d1ddf1}.pill.downloaded{background:#153e35;color:#8ce8be}.pill.failed{background:#4b2830;color:#ffb0b0}.empty{padding:45px 18px;text-align:center;color:var(--muted)}.empty .big{font-size:30px;margin-bottom:8px}.progress{height:5px;background:#273650;border-radius:8px;overflow:hidden;margin-top:8px}.progress span{height:100%;display:block;width:0;background:linear-gradient(90deg,#7e9dff,#83e0b0);transition:width .2s}.foot{font-size:11px;color:#7486a4;text-align:center;margin-top:22px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(3,1fr)}main{padding:22px 13px}.panel{padding:17px}}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div class="logo">PDF</div><div><div class="eyebrow">Local utility · Free</div><h1>Website PDF Downloader</h1><p>Find linked PDFs, select what you need, and download in bulk.</p></div></header>
+<div class="layout">
+<section class="panel">
+<h2>Scan a website</h2>
+<form id="scanForm">
+<div class="field"><label for="url">Website starting URL</label><input id="url" type="url" placeholder="https://example.com" required value=""><div class="help">Scans pages on the same hostname by default.</div></div>
+<div class="field"><label for="depth">Crawl depth</label><select id="depth"><option value="0">0 · Starting page only</option><option value="1">1 · One link level</option><option value="2">2 · Two link levels</option><option value="3" selected>3 · Recommended</option><option value="4">4 · Deeper scan</option><option value="5">5 · Very deep</option></select></div>
+<div class="field"><label for="pageLimit">Maximum pages to scan</label><select id="pageLimit"><option value="50">50 pages</option><option value="200" selected>200 pages</option><option value="500">500 pages</option><option value="1000">1,000 pages</option><option value="5000">5,000 pages</option></select><div class="help">Large websites may take time. Sitemap links are checked too.</div></div>
+<button class="btn primary full" id="scanBtn" type="submit">⌕ &nbsp; Scan website</button>
+</form>
+<p class="privacy"><b>✓ Runs on your computer.</b> No paid service or cloud upload. Please respect site terms, robots guidance, and copyright. Does not bypass logins or paywalls.</p>
+</section>
+<section class="panel">
+<div class="metrics">
+<div class="metric"><div class="value" id="pdfCount">0</div><div class="label">PDFs discovered</div></div>
+<div class="metric"><div class="value" id="pageCount">0</div><div class="label">Pages scanned</div></div>
+<div class="metric"><div class="value" id="selectedCount">0</div><div class="label">Selected</div></div>
+</div>
+<div class="status"><span class="dot" id="statusDot"></span><div style="flex:1"><div id="statusText">Ready to scan</div><div class="progress"><span id="progressBar"></span></div></div></div>
+<div class="toolbar">
+<button class="btn secondary" id="selectAllBtn" disabled>Select all</button>
+<button class="btn secondary" id="downloadBtn" disabled>↓ Download selected</button>
+<button class="btn ghost" id="exportBtn" disabled>Export CSV</button>
+<span class="spacer"></span><span class="count" id="resultCount">No results yet</span>
+</div>
+<div class="tablewrap"><table><thead><tr><th><input type="checkbox" id="masterCheck" aria-label="Select all results"></th><th>PDF file</th><th>Source page</th><th>Size</th><th>Status</th></tr></thead><tbody id="resultsBody"><tr><td colspan="5"><div class="empty"><div class="big">⌕</div><strong>Your results will appear here</strong><div>Enter a website URL and start scanning.</div></div></td></tr></tbody></table></div>
+</section>
+</div>
+<div class="foot">FreePDFDownloader · Local-only interface · Downloads are saved in the project’s downloads folder</div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let results = [];
+let pollTimer = null;
+let scanBusy = false;
+let downloadBusy = false;
+function esc(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function prettySize(n) {
+  if (n == null || n === "") return "—";
+  n = Number(n);
+  if (!Number.isFinite(n)) return "—";
+  if (n < 1024) return n + " B";
+  if (n < 1024*1024) return (n/1024).toFixed(1) + " KB";
+  return (n/(1024*1024)).toFixed(1) + " MB";
+}
+function selected() { return results.filter(r => r.selected).map(r => r.url); }
+function updateMetrics(data) {
+  $("pdfCount").textContent = results.length;
+  $("pageCount").textContent = data.pages_seen || 0;
+  $("selectedCount").textContent = results.filter(r => r.selected).length;
+  $("resultCount").textContent = results.length ? results.length + " PDF(s)" : "No results yet";
+  $("scanBtn").disabled = !!data.scanning || !!data.downloading;
+  $("downloadBtn").disabled = !!data.scanning || !!data.downloading || selected().length === 0;
+  $("selectAllBtn").disabled = results.length === 0;
+  $("exportBtn").disabled = results.length === 0;
+  $("masterCheck").checked = results.length > 0 && results.every(r => r.selected);
+  $("masterCheck").indeterminate = results.some(r => r.selected) && !results.every(r => r.selected);
+  const dot = $("statusDot");
+  dot.className = "dot" + (data.scanning || data.downloading ? " active" : ((data.error || results.some(r=>r.status==="Failed")) ? " error" : (results.length ? " ok" : "")));
+  $("statusText").textContent = data.error ? "Error: " + data.error : (data.downloading ? (data.download_message || "Downloading…") : (data.scanning ? (data.message || "Scanning…") : (data.message || "Ready to scan")));
+  let pct = 0;
+  if (data.downloading && data.download_total) pct = 100 * data.download_progress / data.download_total;
+  else if (data.scanning && data.page_limit) pct = Math.min(95, 100 * data.pages_seen / data.page_limit);
+  else if (!data.scanning && !data.downloading && results.length) pct = 100;
+  $("progressBar").style.width = pct + "%";
+}
+function render(data) {
+  if (data && Array.isArray(data.results)) results = data.results;
+  updateMetrics(data || {});
+  const body = $("resultsBody");
+  if (!results.length) {
+    body.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="big">⌕</div><strong>No PDFs listed yet</strong><div>Start a scan to discover linked PDF files.</div></div></td></tr>';
+    return;
+  }
+  body.innerHTML = results.map((r) => {
+    const statusClass = r.status === "Downloaded" ? " downloaded" : (r.status === "Failed" ? " failed" : "");
+    const size = prettySize(r.size);
+    return '<tr><td><input type="checkbox" data-id="' + esc(r.id) + '" ' + (r.selected ? "checked" : "") + ' aria-label="Select ' + esc(r.filename) + '"></td>' +
+      '<td><div class="filecell"><span class="pdficon">PDF</span><div><div class="filename">' + esc(r.filename) + '</div><div class="sub"><a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">Open PDF source ↗</a></div>' + (r.error ? '<div class="sub" style="color:#ffb0b0">' + esc(r.error) + '</div>' : '') + '</div></div></td>' +
+      '<td><a href="' + esc(r.source) + '" target="_blank" rel="noopener noreferrer">' + esc(r.source) + '</a></td>' +
+      '<td>' + size + '</td><td><span class="pill' + statusClass + '">' + esc(r.status || "Found") + '</span></td></tr>';
+  }).join("");
+}
+$("resultsBody").addEventListener("change", (event) => {
+  const input = event.target;
+  if (!input.matches('input[type="checkbox"][data-id]')) return;
+  const row = results.find(r => r.id === input.dataset.id);
+  if (row) row.selected = input.checked;
+  updateMetrics({scanning:scanBusy, downloading:downloadBusy, pages_seen:Number($("pageCount").textContent), message:$("statusText").textContent});
+});
+$("masterCheck").addEventListener("change", () => {
+  results.forEach(r => r.selected = $("masterCheck").checked);
+  render({scanning:scanBusy, downloading:downloadBusy, pages_seen:Number($("pageCount").textContent), message:$("statusText").textContent});
+});
+$("selectAllBtn").addEventListener("click", () => {
+  const allSelected = results.length && results.every(r => r.selected);
+  results.forEach(r => r.selected = !allSelected);
+  render({scanning:scanBusy, downloading:downloadBusy, pages_seen:Number($("pageCount").textContent), message:$("statusText").textContent});
+});
+async function poll() {
+  try {
+    const response = await fetch("/api/status");
+    const data = await response.json();
+    scanBusy = !!data.scanning;
+    downloadBusy = !!data.downloading;
+    render(data);
+    if (!scanBusy && !downloadBusy) {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  } catch (err) {
+    $("statusText").textContent = "Could not connect to local app. Is the server running?";
+    $("statusDot").className = "dot error";
+  }
+}
+$("scanForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const url = $("url").value.trim();
+  if (!url) return;
+  try {
+    const response = await fetch("/api/scan", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:url,depth:Number($("depth").value),page_limit:Number($("pageLimit").value)})});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Unable to start scan");
+    results = [];
+    scanBusy = true;
+    render({scanning:true,downloading:false,pages_seen:0,page_limit:Number($("pageLimit").value),message:"Scan started"});
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(poll, 1000);
+    poll();
+  } catch (err) { $("statusText").textContent = err.message; $("statusDot").className = "dot error"; }
+});
+$("downloadBtn").addEventListener("click", async () => {
+  try {
+    const urls = selected();
+    const response = await fetch("/api/download", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({urls:urls})});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Unable to start downloads");
+    downloadBusy = true;
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(poll, 1000);
+    poll();
+  } catch (err) { $("statusText").textContent = err.message; $("statusDot").className = "dot error"; }
+});
+$("exportBtn").addEventListener("click", () => { window.location.href = "/api/export.csv"; });
+poll();
+</script>
+</body>
+</html>
